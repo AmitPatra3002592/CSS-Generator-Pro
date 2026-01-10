@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Generator Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>CSS Generator Pro</h1>
+            <p>Complete CSS Toolkit - Generate & Copy Code</p>
+        </div>
+        <button id="theme-toggle" onclick="toggleTheme()" class="theme-btn" aria-label="Toggle Dark Mode">
+            🌙
+        </button>
+    </header>
+    <div class="container">
+        <div class="generator-nav">
+            <button onclick="showGenerator('gradient')" class="nav-button btn-purple active">
+                Gradient
+            </button>
+            <button onclick="showGenerator('shadow')" class="nav-button btn-blue">
+                Box Shadow
+            </button>
+            <button onclick="showGenerator('border')" class="nav-button btn-green">
+                Border Radius
+            </button>
+            <button onclick="showGenerator('flexbox')" class="nav-button btn-orange">
+                Flexbox
+            </button>
+            <button onclick="showGenerator('transform')" class="nav-button btn-red">
+                Transform
+            </button>
+            <button onclick="showGenerator('text')" class="nav-button btn-indigo">
+                Text Shadow
+            </button>
+            <button onclick="showGenerator('animation')" class="nav-button btn-pink">
+                Animation
+            </button>
+            <button onclick="showGenerator('filter')" class="nav-button btn-teal">
+                Filter
+            </button>
+            <button onclick="showGenerator('glass')" class="nav-button btn-cyan">
+                Glassmorphism
+            </button>
+        </div>
+
+        <div id="gradient-generator" class="generator-card">
+            <h2>🌈 Gradient Generator</h2>
+            <div class="grid">
+                <div>
+                    <div class="control-group">
+                        <label>Direction</label>
+                        <select id="gradient-direction" onchange="updateGradient()">
+                            <option value="to right">Left to Right</option>
+                            <option value="to left">Right to Left</option>
+                            <option value="to bottom">Top to Bottom</option>
+                            <option value="to top">Bottom to Top</option>
+                            <option value="45deg">Diagonal (45°)</option>
+                            <option value="135deg">Diagonal (135°)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Color 1</label>
+                        <input type="color" id="gradient-color1" value="#ff6b6b" oninput="updateGradient()">
+                    </div>
+                    <div class="control-group">
+                        <label>Color 2</label>
+                        <input type="color" id="gradient-color2" value="#4ecdc4" oninput="updateGradient()">
+                    </div>
+                    <div class="control-group">
+                        <label>Color 3 (Optional)</label>
+                        <input type="color" id="gradient-color3" value="#45b7d1" oninput="updateGradient()">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="gradient-use-color3" onchange="updateGradient()">
+                            <span>Use third color</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <div class="preview-container">
+                        <label>Preview</label>
+                        <div class="preview-box">
+                            <div id="gradient-preview" style="width: 100%; height: 100%; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Generated CSS</label>
+                        <div id="gradient-output" class="code-output"></div>
+                        <button onclick="copyToClipboard('gradient-output')" class="copy-btn btn-purple">
+                            Copy CSS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="shadow-generator" class="generator-card hidden">
+            <h2>📦 Box Shadow Generator</h2>
+            <div class="grid">
+                <div>
+                    <div class="control-group">
+                        <label>Horizontal Offset</label>
+                        <input type="range" id="shadow-x" min="-50" max="50" value="10" oninput="updateShadow()">
+                        <span id="shadow-x-value" class="value-display">10px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Vertical Offset</label>
+                        <input type="range" id="shadow-y" min="-50" max="50" value="10" oninput="updateShadow()">
+                        <span id="shadow-y-value" class="value-display">10px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Blur Radius</label>
+                        <input type="range" id="shadow-blur" min="0" max="50" value="20" oninput="updateShadow()">
+                        <span id="shadow-blur-value" class="value-display">20px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Spread</label>
+                        <input type="range" id="shadow-spread" min="-20" max="20" value="0" oninput="updateShadow()">
+                        <span id="shadow-spread-value" class="value-display">0px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Shadow Color</label>
+                        <input type="color" id="shadow-color" value="#000000" oninput="updateShadow()">
+                    </div>
+                    <div class="control-group">
+                        <label>Opacity</label>
+                        <input type="range" id="shadow-opacity" min="0" max="100" value="25" oninput="updateShadow()">
+                        <span id="shadow-opacity-value" class="value-display">25%</span>
+                    </div>
+                    <div class="control-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="shadow-inset" onchange="updateShadow()">
+                            <span>Inset shadow</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <div class="preview-container">
+                        <label>Preview</label>
+                        <div class="preview-box">
+                            <div id="shadow-preview"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Generated CSS</label>
+                        <div id="shadow-output" class="code-output"></div>
+                        <button onclick="copyToClipboard('shadow-output')" class="copy-btn btn-blue">
+                            Copy CSS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="border-generator" class="generator-card hidden">
+            <h2>🔲 Border Radius Generator</h2>
+            <div class="grid">
+                <div>
+                    <div class="control-group">
+                        <label>Top Left</label>
+                        <input type="range" id="border-tl" min="0" max="100" value="10" oninput="updateBorder()">
+                        <span id="border-tl-value" class="value-display">10px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Top Right</label>
+                        <input type="range" id="border-tr" min="0" max="100" value="10" oninput="updateBorder()">
+                        <span id="border-tr-value" class="value-display">10px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Bottom Right</label>
+                        <input type="range" id="border-br" min="0" max="100" value="10" oninput="updateBorder()">
+                        <span id="border-br-value" class="value-display">10px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Bottom Left</label>
+                        <input type="range" id="border-bl" min="0" max="100" value="10" oninput="updateBorder()">
+                        <span id="border-bl-value" class="value-display">10px</span>
+                    </div>
+                    <div class="control-group" style="display: flex; gap: 8px;">
+                        <button onclick="syncBorderRadius()" class="copy-btn btn-green">
+                            Sync All
+                        </button>
+                        <button onclick="resetBorderRadius()" class="copy-btn btn-gray">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <div class="preview-container">
+                        <label>Preview</label>
+                        <div class="preview-box">
+                            <div id="border-preview"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Generated CSS</label>
+                        <div id="border-output" class="code-output"></div>
+                        <button onclick="copyToClipboard('border-output')" class="copy-btn btn-green">
+                            Copy CSS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="flexbox-generator" class="generator-card hidden">
+            <h2>📐 Flexbox Generator</h2>
+            <div class="grid">
+                <div>
+                    <div class="control-group">
+                        <label>Flex Direction</label>
+                        <select id="flex-direction" onchange="updateFlexbox()">
+                            <option value="row">Row</option>
+                            <option value="column">Column</option>
+                            <option value="row-reverse">Row Reverse</option>
+                            <option value="column-reverse">Column Reverse</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Justify Content</label>
+                        <select id="justify-content" onchange="updateFlexbox()">
+                            <option value="flex-start">Flex Start</option>
+                            <option value="center">Center</option>
+                            <option value="flex-end">Flex End</option>
+                            <option value="space-between">Space Between</option>
+                            <option value="space-around">Space Around</option>
+                            <option value="space-evenly">Space Evenly</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Align Items</label>
+                        <select id="align-items" onchange="updateFlexbox()">
+                            <option value="stretch">Stretch</option>
+                            <option value="flex-start">Flex Start</option>
+                            <option value="center">Center</option>
+                            <option value="flex-end">Flex End</option>
+                            <option value="baseline">Baseline</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Flex Wrap</label>
+                        <select id="flex-wrap" onchange="updateFlexbox()">
+                            <option value="nowrap">No Wrap</option>
+                            <option value="wrap">Wrap</option>
+                            <option value="wrap-reverse">Wrap Reverse</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Gap</label>
+                        <input type="range" id="flex-gap" min="0" max="50" value="10" oninput="updateFlexbox()">
+                        <span id="flex-gap-value" class="value-display">10px</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="preview-container">
+                        <label>Preview</label>
+                        <div class="preview-box">
+                            <div id="flexbox-preview">
+                                <div class="flex-item">1</div>
+                                <div class="flex-item">2</div>
+                                <div class="flex-item">3</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Generated CSS</label>
+                        <div id="flexbox-output" class="code-output"></div>
+                        <button onclick="copyToClipboard('flexbox-output')" class="copy-btn btn-orange">
+                            Copy CSS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="transform-generator" class="generator-card hidden">
+            <h2>🔄 Transform Generator</h2>
+            <div class="grid">
+                <div>
+                    <div class="control-group">
+                        <label>Rotate (degrees)</label>
+                        <input type="range" id="transform-rotate" min="-180" max="180" value="0"
+                            oninput="updateTransform()">
+                        <span id="transform-rotate-value" class="value-display">0°</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Scale X</label>
+                        <input type="range" id="transform-scaleX" min="0.1" max="3" step="0.1" value="1"
+                            oninput="updateTransform()">
+                        <span id="transform-scaleX-value" class="value-display">1</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Scale Y</label>
+                        <input type="range" id="transform-scaleY" min="0.1" max="3" step="0.1" value="1"
+                            oninput="updateTransform()">
+                        <span id="transform-scaleY-value" class="value-display">1</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Translate X (px)</label>
+                        <input type="range" id="transform-translateX" min="-100" max="100" value="0"
+                            oninput="updateTransform()">
+                        <span id="transform-translateX-value" class="value-display">0px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Translate Y (px)</label>
+                        <input type="range" id="transform-translateY" min="-100" max="100" value="0"
+                            oninput="updateTransform()">
+                        <span id="transform-translateY-value" class="value-display">0px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Skew X (degrees)</label>
+                        <input type="range" id="transform-skewX" min="-45" max="45" value="0"
+                            oninput="updateTransform()">
+                        <span id="transform-skewX-value" class="value-display">0°</span>
+                    </div>
+                    <button onclick="resetTransform()" class="copy-btn btn-gray">
+                        Reset All
+                    </button>
+                </div>
+                <div>
+                    <div class="preview-container">
+                        <label>Preview</label>
+                        <div class="preview-box">
+                            <div id="transform-preview">T</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Generated CSS</label>
+                        <div id="transform-output" class="code-output"></div>
+                        <button onclick="copyToClipboard('transform-output')" class="copy-btn btn-red">
+                            Copy CSS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="text-generator" class="generator-card hidden">
+            <h2>✨ Text Shadow Generator</h2>
+            <div class="grid">
+                <div>
+                    <div class="control-group">
+                        <label>Horizontal Offset</label>
+                        <input type="range" id="text-x" min="-20" max="20" value="2" oninput="updateTextShadow()">
+                        <span id="text-x-value" class="value-display">2px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Vertical Offset</label>
+                        <input type="range" id="text-y" min="-20" max="20" value="2" oninput="updateTextShadow()">
+                        <span id="text-y-value" class="value-display">2px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Blur Radius</label>
+                        <input type="range" id="text-blur" min="0" max="20" value="4" oninput="updateTextShadow()">
+                        <span id="text-blur-value" class="value-display">4px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Shadow Color</label>
+                        <input type="color" id="text-color" value="#000000" oninput="updateTextShadow()">
+                    </div>
+                    <div class="control-group">
+                        <label>Opacity</label>
+                        <input type="range" id="text-opacity" min="0" max="100" value="50" oninput="updateTextShadow()">
+                        <span id="text-opacity-value" class="value-display">50%</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Sample Text</label>
+                        <input type="text" id="text-sample" value="Sample Text" oninput="updateTextShadow()">
+                    </div>
+                </div>
+                <div>
+                    <div class="preview-container">
+                        <label>Preview</label>
+                        <div class="preview-box">
+                            <div id="text-preview">Sample Text</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Generated CSS</label>
+                        <div id="text-output" class="code-output"></div>
+                        <button onclick="copyToClipboard('text-output')" class="copy-btn btn-indigo">
+                            Copy CSS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="animation-generator" class="generator-card hidden">
+            <h2>🎬 Animation Generator</h2>
+            <div class="grid">
+                <div>
+                    <div class="control-group">
+                        <label>Animation Type</label>
+                        <select id="animation-type" onchange="updateAnimation()">
+                            <option value="bounce">Bounce</option>
+                            <option value="pulse">Pulse</option>
+                            <option value="shake">Shake</option>
+                            <option value="rotate">Rotate</option>
+                            <option value="fadeIn">Fade In</option>
+                            <option value="slideIn">Slide In</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Duration (seconds)</label>
+                        <input type="range" id="animation-duration" min="0.1" max="5" step="0.1" value="1"
+                            oninput="updateAnimation()">
+                        <span id="animation-duration-value" class="value-display">1s</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Timing Function</label>
+                        <select id="animation-timing" onchange="updateAnimation()">
+                            <option value="ease">Ease</option>
+                            <option value="linear">Linear</option>
+                            <option value="ease-in">Ease In</option>
+                            <option value="ease-out">Ease Out</option>
+                            <option value="ease-in-out">Ease In Out</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Iteration Count</label>
+                        <select id="animation-iteration" onchange="updateAnimation()">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="infinite">Infinite</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Direction</label>
+                        <select id="animation-direction" onchange="updateAnimation()">
+                            <option value="normal">Normal</option>
+                            <option value="reverse">Reverse</option>
+                            <option value="alternate">Alternate</option>
+                            <option value="alternate-reverse">Alternate Reverse</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <div class="preview-container">
+                        <label>Preview</label>
+                        <div class="preview-box">
+                            <div id="animation-preview">A</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Generated CSS</label>
+                        <div id="animation-output" class="code-output"></div>
+                        <button onclick="copyToClipboard('animation-output')" class="copy-btn btn-pink">
+                            Copy CSS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="filter-generator" class="generator-card hidden">
+            <h2>🎨 Filter Generator</h2>
+            <div class="grid">
+                <div>
+                    <div class="control-group">
+                        <label>Blur (px)</label>
+                        <input type="range" id="filter-blur" min="0" max="20" value="0" oninput="updateFilter()">
+                        <span id="filter-blur-value" class="value-display">0px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Brightness (%)</label>
+                        <input type="range" id="filter-brightness" min="0" max="200" value="100"
+                            oninput="updateFilter()">
+                        <span id="filter-brightness-value" class="value-display">100%</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Contrast (%)</label>
+                        <input type="range" id="filter-contrast" min="0" max="200" value="100" oninput="updateFilter()">
+                        <span id="filter-contrast-value" class="value-display">100%</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Saturate (%)</label>
+                        <input type="range" id="filter-saturate" min="0" max="200" value="100" oninput="updateFilter()">
+                        <span id="filter-saturate-value" class="value-display">100%</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Hue Rotate (degrees)</label>
+                        <input type="range" id="filter-hue" min="0" max="360" value="0" oninput="updateFilter()">
+                        <span id="filter-hue-value" class="value-display">0°</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Grayscale (%)</label>
+                        <input type="range" id="filter-grayscale" min="0" max="100" value="0" oninput="updateFilter()">
+                        <span id="filter-grayscale-value" class="value-display">0%</span>
+                    </div>
+                    <button onclick="resetFilter()" class="copy-btn btn-gray">
+                        Reset All
+                    </button>
+                </div>
+                <div>
+                    <div class="preview-container">
+                        <label>Preview</label>
+                        <div class="preview-box">
+                            <div id="filter-preview">F</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Generated CSS</label>
+                        <div id="filter-output" class="code-output"></div>
+                        <button onclick="copyToClipboard('filter-output')" class="copy-btn btn-teal">
+                            Copy CSS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="glass-generator" class="generator-card hidden">
+            <h2>🧊 Glassmorphism Generator</h2>
+            <div class="grid">
+                <div>
+                    <div class="control-group">
+                        <label>Background Color</label>
+                        <input type="color" id="glass-color" value="#ffffff" oninput="updateGlass()">
+                    </div>
+                    <div class="control-group">
+                        <label>Transparency</label>
+                        <input type="range" id="glass-opacity" min="0" max="100" value="25" oninput="updateGlass()">
+                        <span id="glass-opacity-value" class="value-display">0.25</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Blur (px)</label>
+                        <input type="range" id="glass-blur" min="0" max="20" value="4" oninput="updateGlass()">
+                        <span id="glass-blur-value" class="value-display">4px</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Border Color</label>
+                        <input type="color" id="glass-border-color" value="#ffffff" oninput="updateGlass()">
+                    </div>
+                    <div class="control-group">
+                        <label>Border Transparency</label>
+                        <input type="range" id="glass-border-opacity" min="0" max="100" value="30" oninput="updateGlass()">
+                        <span id="glass-border-opacity-value" class="value-display">0.30</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="preview-container">
+                        <label>Preview</label>
+                        <div class="preview-box"
+                            style="background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover;">
+                            <div id="glass-preview">Glass</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Generated CSS</label>
+                        <div id="glass-output" class="code-output"></div>
+                        <button onclick="copyToClipboard('glass-output')" class="copy-btn btn-cyan">
+                            Copy CSS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <h3>CSS Generator Pro</h3>
+                <p>Generate professional CSS code instantly with live previews</p>
+                <div class="footer-features">
+                    <span>9 Powerful Generators</span>
+                    <span>•</span>
+                    <span>Live Preview</span>
+                    <span>•</span>
+                    <span>Copy-Ready Code</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
