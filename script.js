@@ -1,3 +1,64 @@
+//  FIREBASE CONFIGURATION & IMPORTS
+// ==========================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyApQ9al9OGiFUTrD26XLKT6Nav0Jr7lwjA",
+    authDomain: "css-generator-pro.firebaseapp.com",
+    projectId: "css-generator-pro",
+    storageBucket: "css-generator-pro.firebasestorage.app",
+    messagingSenderId: "543151556319",
+    appId: "1:543151556319:web:e37e7fee2c7f5392dc8b6a",
+    measurementId: "G-1NF39XDSBQ"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+// --- Login Function ---
+async function loginWithGoogle() {
+    try {
+        await signInWithPopup(auth, provider);
+    } catch (error) {
+        console.error("Login failed:", error);
+        alert("Login failed: " + error.message);
+    }
+}
+
+// --- Logout Function ---
+function logout() {
+    signOut(auth).then(() => {
+        alert("Logged out!");
+    }).catch((error) => {
+        console.error("Logout error", error);
+    });
+}
+
+// --- Check Login State ---
+onAuthStateChanged(auth, (user) => {
+    const loginBtn = document.getElementById('login-btn');
+    const userInfo = document.getElementById('user-info');
+    const userPic = document.getElementById('user-pic');
+
+    if (user) {
+        // User is logged in
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (userInfo) userInfo.style.display = 'flex';
+        if (userPic) userPic.src = user.photoURL;
+    } else {
+        // User is logged out
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (userInfo) userInfo.style.display = 'none';
+    }
+});
+
+// GENERATOR CODE
+// ==========================================
+
 // Show/Hide generators and update active button
 function showGenerator(type) {
     const generators = ['gradient', 'shadow', 'border', 'flexbox', 'transform', 'text', 'animation', 'filter', 'glass'];
@@ -443,3 +504,24 @@ document.addEventListener('DOMContentLoaded', function () {
         if (button) button.textContent = '☀️';
     }
 });
+
+// CONNECTING JS TO HTML
+// ==========================================
+window.loginWithGoogle = loginWithGoogle;
+window.logout = logout;
+window.showGenerator = showGenerator;
+window.updateGradient = updateGradient;
+window.updateShadow = updateShadow;
+window.updateBorder = updateBorder;
+window.syncBorderRadius = syncBorderRadius;
+window.resetBorderRadius = resetBorderRadius;
+window.updateFlexbox = updateFlexbox;
+window.updateTransform = updateTransform;
+window.resetTransform = resetTransform;
+window.updateTextShadow = updateTextShadow;
+window.updateAnimation = updateAnimation;
+window.updateFilter = updateFilter;
+window.resetFilter = resetFilter;
+window.updateGlass = updateGlass;
+window.copyToClipboard = copyToClipboard;
+window.toggleTheme = toggleTheme;
