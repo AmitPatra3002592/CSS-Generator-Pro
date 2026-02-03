@@ -500,6 +500,7 @@ function copyToClipboard(elementId) {
 
 //  SAVE SNIPPET FUNCTION
 // ==========================================
+
 async function saveSnippet() {
     const user = auth.currentUser;
 
@@ -507,36 +508,41 @@ async function saveSnippet() {
         alert("Please Sign In to save your snippets!");
         return;
     }
+    const generatorTypes = ['gradient', 'shadow', 'border', 'flexbox', 'transform', 'text', 'animation', 'filter', 'glass'];
+    let activeType = null;
+    for (const type of generatorTypes) {
+        const el = document.getElementById(type + '-generator');
 
-    const activePanel = document.querySelector('.generator-panel:not(.hidden)');
+        if (el && !el.classList.contains('hidden')) {
+            activeType = type;
+            break;
+        }
+    }
 
-    if (!activePanel) {
-        console.error("No active panel found");
+    if (!activeType) {
+        console.error("Debug: Could not find any active generator div.");
+        alert("Error: No active generator found. Please refresh and try again.");
         return;
     }
 
-    const type = activePanel.id.replace('-generator', '');
-    const outputId = type + '-output';
+    const outputId = activeType + '-output';
     const outputElement = document.getElementById(outputId);
 
     if (!outputElement) {
-        alert("Could not find CSS to save for this generator.");
+        alert(`Error: Could not find the CSS output box for ${activeType}`);
         return;
     }
-
     const cssCode = outputElement.textContent;
-
     try {
         await addDoc(collection(db, "snippets"), {
             userId: user.uid,
             userEmail: user.email,
-            type: type,
+            type: activeType,
             code: cssCode,
             timestamp: new Date()
         });
 
-        // Show a nicer success message
-        alert(`✅ ${type.toUpperCase()} saved to Library!`);
+        alert(`✅ ${activeType.toUpperCase()} saved to Library!`);
 
     } catch (e) {
         console.error("Error adding document: ", e);
