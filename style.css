@@ -105,6 +105,14 @@ header p {
     background-color: #7c3aed;
 }
 
+.btn-orange {
+    background-color: #ea580c;
+}
+
+.btn-orange:hover {
+    background-color: #c2410c;
+}
+
 .btn-blue {
     background-color: #2563eb;
 }
@@ -342,6 +350,17 @@ select {
     border: none;
     cursor: pointer;
     transition: background-color 0.2s;
+}
+
+/* Save Button */
+.action-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-left: 5px;
 }
 
 /* Toast Notification */

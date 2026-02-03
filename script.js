@@ -3,6 +3,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
     from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { getFirestore, collection, addDoc }
+    from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyApQ9al9OGiFUTrD26XLKT6Nav0Jr7lwjA",
@@ -14,9 +16,10 @@ const firebaseConfig = {
     measurementId: "G-1NF39XDSBQ"
 };
 
-// Initialize Firebase
+// Initialize Firebase & Database
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
 // --- Login Function ---
@@ -53,6 +56,34 @@ onAuthStateChanged(auth, (user) => {
         // User is logged out
         if (loginBtn) loginBtn.style.display = 'block';
         if (userInfo) userInfo.style.display = 'none';
+    }
+});
+
+// --- DARK MODE ---
+
+function toggleTheme() {
+    const body = document.body;
+    const button = document.getElementById('theme-toggle');
+    body.classList.toggle('dark-mode');
+
+    // Check if dark mode is now ON or OFF
+    const isDark = body.classList.contains('dark-mode');
+
+    // Update Button Icon
+    button.textContent = isDark ? '☀︎' : '⏾';
+
+    // Save preference to Local Storage so it remembers on refresh
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+
+// Check Local Storage on page load
+document.addEventListener('DOMContentLoaded', function () {
+    const savedTheme = localStorage.getItem('theme');
+    const button = document.getElementById('theme-toggle');
+
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (button) button.textContent = '☀︎';
     }
 });
 
@@ -467,6 +498,52 @@ function copyToClipboard(elementId) {
     });
 }
 
+//  SAVE SNIPPET FUNCTION
+// ==========================================
+async function saveSnippet() {
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("Please Sign In to save your snippets!");
+        return;
+    }
+
+    const activePanel = document.querySelector('.generator-panel:not(.hidden)');
+
+    if (!activePanel) {
+        console.error("No active panel found");
+        return;
+    }
+
+    const type = activePanel.id.replace('-generator', '');
+    const outputId = type + '-output';
+    const outputElement = document.getElementById(outputId);
+
+    if (!outputElement) {
+        alert("Could not find CSS to save for this generator.");
+        return;
+    }
+
+    const cssCode = outputElement.textContent;
+
+    try {
+        await addDoc(collection(db, "snippets"), {
+            userId: user.uid,
+            userEmail: user.email,
+            type: type,
+            code: cssCode,
+            timestamp: new Date()
+        });
+
+        // Show a nicer success message
+        alert(`✅ ${type.toUpperCase()} saved to Library!`);
+
+    } catch (e) {
+        console.error("Error adding document: ", e);
+        alert("Error saving: " + e.message);
+    }
+}
+
 // Initialize with gradient generator
 document.addEventListener('DOMContentLoaded', function () {
     showGenerator('gradient');
@@ -477,38 +554,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// --- DARK MODE ---
-
-function toggleTheme() {
-    const body = document.body;
-    const button = document.getElementById('theme-toggle');
-    body.classList.toggle('dark-mode');
-
-    // Check if dark mode is now ON or OFF
-    const isDark = body.classList.contains('dark-mode');
-
-    // Update Button Icon
-    button.textContent = isDark ? '☀️' : '🌙';
-
-    // Save preference to Local Storage so it remembers on refresh
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-}
-
-// Check Local Storage on page load
-document.addEventListener('DOMContentLoaded', function () {
-    const savedTheme = localStorage.getItem('theme');
-    const button = document.getElementById('theme-toggle');
-
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        if (button) button.textContent = '☀️';
-    }
-});
-
 // CONNECTING JS TO HTML
 // ==========================================
 window.loginWithGoogle = loginWithGoogle;
 window.logout = logout;
+window.saveSnippet = saveSnippet;
 window.showGenerator = showGenerator;
 window.updateGradient = updateGradient;
 window.updateShadow = updateShadow;
