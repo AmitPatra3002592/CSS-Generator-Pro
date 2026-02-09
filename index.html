@@ -14,23 +14,29 @@
             <h1>CSS Generator Pro</h1>
             <p>Complete CSS Toolkit - Generate & Copy Code</p>
         </div>
-        <div class="header-right">   
+        <div class="header-right">
             <div id="user-section">
                 <button id="login-btn" onclick="loginWithGoogle()" class="login-btn">
                     Sign In
                 </button>
-                <div id="user-info" style="display: none; align-items: center; gap: 10px;">
-                    <img id="user-pic" src="" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-                    <button onclick="logout()"
-                        style="background:none; border:none; color:inherit; cursor:pointer; font-size:0.9rem;">Logout</button>
+                <div id="user-info" class="user-header-group">
+                    <div class="profile-dropdown">
+                        <img id="user-pic" src="" alt="Profile" class="profile-pic">
+                        <div class="dropdown-content">
+                            <button onclick="logout()" class="dropdown-btn">Logout</button>
+                        </div>
+                    </div>
+                    <button onclick="openLibrary()" class="nav-button library-btn">
+                        📂 My Library
+                    </button>
                 </div>
-            </div>   
+            </div>
             <button id="theme-toggle" onclick="toggleTheme()" class="theme-btn">
                 ⏾
             </button>
-    
         </div>
     </header>
+
     <div class="container">
         <div class="generator-nav">
             <button onclick="showGenerator('gradient')" class="nav-button btn-purple active">
@@ -549,6 +555,7 @@
                 </div>
             </div>
         </div>
+
         <div id="glass-generator" class="generator-card hidden">
             <h2>🧊 Glassmorphism Generator</h2>
             <div class="grid">
@@ -573,7 +580,8 @@
                     </div>
                     <div class="control-group">
                         <label>Border Transparency</label>
-                        <input type="range" id="glass-border-opacity" min="0" max="100" value="30" oninput="updateGlass()">
+                        <input type="range" id="glass-border-opacity" min="0" max="100" value="30"
+                            oninput="updateGlass()">
                         <span id="glass-border-opacity-value" class="value-display">0.30</span>
                     </div>
                 </div>
@@ -615,6 +623,17 @@
             </div>
         </div>
     </footer>
+
+    <div id="library-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📂 My Library</h2>
+                <button onclick="closeLibrary()" class="close-btn">&times;</button>
+            </div>
+            <div id="snippets-list" class="snippets-grid">
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="script.js"></script>
 </body>

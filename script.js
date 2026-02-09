@@ -3,7 +3,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
     from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc }
+import { getFirestore, collection, addDoc, query, where, getDocs, doc, deleteDoc }
     from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -22,7 +22,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// --- Login Function ---
+
+//  AUTHENTICATION
+// ==========================================
 async function loginWithGoogle() {
     try {
         await signInWithPopup(auth, provider);
@@ -32,7 +34,6 @@ async function loginWithGoogle() {
     }
 }
 
-// --- Logout Function ---
 function logout() {
     signOut(auth).then(() => {
         alert("Logged out!");
@@ -41,56 +42,153 @@ function logout() {
     });
 }
 
-// --- Check Login State ---
 onAuthStateChanged(auth, (user) => {
     const loginBtn = document.getElementById('login-btn');
     const userInfo = document.getElementById('user-info');
     const userPic = document.getElementById('user-pic');
 
     if (user) {
-        // User is logged in
         if (loginBtn) loginBtn.style.display = 'none';
         if (userInfo) userInfo.style.display = 'flex';
         if (userPic) userPic.src = user.photoURL;
     } else {
-        // User is logged out
         if (loginBtn) loginBtn.style.display = 'block';
         if (userInfo) userInfo.style.display = 'none';
     }
 });
 
-// --- DARK MODE ---
+//  LIBRARY FUNCTIONS
+// ==========================================
+
+// Save Current Design
+async function saveSnippet() {
+    const user = auth.currentUser;
+    if (!user) { alert("Please Sign In to save!"); return; }
+
+    // Smart Detector: Find the active generator
+    const generatorTypes = ['gradient', 'shadow', 'border', 'flexbox', 'transform', 'text', 'animation', 'filter', 'glass'];
+    let activeType = null;
+
+    for (const type of generatorTypes) {
+        const el = document.getElementById(type + '-generator');
+        if (el && !el.classList.contains('hidden')) {
+            activeType = type;
+            break;
+        }
+    }
+
+    if (!activeType) { alert("No active generator found."); return; }
+
+    const outputElement = document.getElementById(activeType + '-output');
+    if (!outputElement) return;
+
+    try {
+        await addDoc(collection(db, "snippets"), {
+            userId: user.uid,
+            type: activeType,
+            code: outputElement.textContent,
+            timestamp: new Date()
+        });
+        alert(`✅ ${activeType.toUpperCase()} saved to Library!`);
+    } catch (e) {
+        alert("Error saving: " + e.message);
+    }
+}
+
+// Open Library Modal
+async function openLibrary() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    document.getElementById('library-modal').classList.remove('hidden');
+    const list = document.getElementById('snippets-list');
+    list.innerHTML = '<p style="text-align:center;">Loading your designs...</p>';
+
+    try {
+        const q = query(collection(db, "snippets"), where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+
+        list.innerHTML = '';
+
+        if (querySnapshot.empty) {
+            list.innerHTML = '<p style="text-align:center;">No saved designs yet.</p>';
+            return;
+        }
+
+        querySnapshot.forEach((docSnapshot) => {
+            const data = docSnapshot.data();
+            const id = docSnapshot.id;
+
+            const card = document.createElement('div');
+            card.className = 'snippet-card';
+            card.innerHTML = `
+                <div class="snippet-info">
+                    <h3 style="margin:0; text-transform:capitalize;">${data.type}</h3>
+                    <pre style="font-size:0.8rem; color:#888;">${data.code.substring(0, 30)}...</pre>
+                </div>
+                <div>
+                    <button onclick="copySnippet('${id}')" class="action-btn" style="font-size:0.8rem; padding:5px 10px;">Copy</button>
+                    <button onclick="deleteSnippet('${id}')" class="delete-btn">🗑️</button>
+                </div>
+                <textarea id="hidden-${id}" style="display:none">${data.code}</textarea>
+            `;
+            list.appendChild(card);
+        });
+
+    } catch (e) {
+        console.error(e);
+        list.innerHTML = '<p style="color:red">Error loading library.</p>';
+    }
+}
+
+function closeLibrary() {
+    document.getElementById('library-modal').classList.add('hidden');
+}
+
+function copySnippet(id) {
+    const code = document.getElementById('hidden-' + id).value;
+    navigator.clipboard.writeText(code).then(() => { alert("Code copied!"); });
+}
+
+async function deleteSnippet(id) {
+    if (!confirm("Delete this design?")) return;
+    try {
+        await deleteDoc(doc(db, "snippets", id));
+        openLibrary();
+    } catch (e) { alert("Error: " + e.message); }
+}
+
+//  DARK MODE
+// ==========================================
 
 function toggleTheme() {
     const body = document.body;
     const button = document.getElementById('theme-toggle');
     body.classList.toggle('dark-mode');
 
-    // Check if dark mode is now ON or OFF
     const isDark = body.classList.contains('dark-mode');
-
-    // Update Button Icon
     button.textContent = isDark ? '☀︎' : '⏾';
-
-    // Save preference to Local Storage so it remembers on refresh
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
-// Check Local Storage on page load
 document.addEventListener('DOMContentLoaded', function () {
     const savedTheme = localStorage.getItem('theme');
     const button = document.getElementById('theme-toggle');
-
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');
         if (button) button.textContent = '☀︎';
     }
+    // Also init the generator
+    showGenerator('gradient');
+    const firstBtn = document.querySelector('.nav-button');
+    if (firstBtn && !document.querySelector('.nav-button.active')) {
+        firstBtn.classList.add('active');
+    }
 });
 
-// GENERATOR CODE
+//  GENERATOR LOGIC
 // ==========================================
 
-// Show/Hide generators and update active button
 function showGenerator(type) {
     const generators = ['gradient', 'shadow', 'border', 'flexbox', 'transform', 'text', 'animation', 'filter', 'glass'];
     const buttons = document.querySelectorAll('.nav-button');
@@ -104,11 +202,12 @@ function showGenerator(type) {
         }
     });
 
-    // Update active button
     buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    // Safe event handling
+    if (typeof event !== 'undefined' && event.target) {
+        event.target.classList.add('active');
+    }
 
-    // Initialize the selected generator
     switch (type) {
         case 'gradient': updateGradient(); break;
         case 'shadow': updateShadow(); break;
@@ -138,7 +237,6 @@ function updateGradient() {
     }
 
     const css = `background: ${gradient};`;
-
     document.getElementById('gradient-preview').style.background = gradient;
     document.getElementById('gradient-output').textContent = css;
 }
@@ -153,14 +251,12 @@ function updateShadow() {
     const opacity = document.getElementById('shadow-opacity').value / 100;
     const inset = document.getElementById('shadow-inset').checked;
 
-    // Update value displays
     document.getElementById('shadow-x-value').textContent = x + 'px';
     document.getElementById('shadow-y-value').textContent = y + 'px';
     document.getElementById('shadow-blur-value').textContent = blur + 'px';
     document.getElementById('shadow-spread-value').textContent = spread + 'px';
     document.getElementById('shadow-opacity-value').textContent = document.getElementById('shadow-opacity').value + '%';
 
-    // Convert hex to rgba
     const r = parseInt(color.substr(1, 2), 16);
     const g = parseInt(color.substr(3, 2), 16);
     const b = parseInt(color.substr(5, 2), 16);
@@ -181,7 +277,6 @@ function updateBorder() {
     const br = document.getElementById('border-br').value;
     const bl = document.getElementById('border-bl').value;
 
-    // Update value displays
     document.getElementById('border-tl-value').textContent = tl + 'px';
     document.getElementById('border-tr-value').textContent = tr + 'px';
     document.getElementById('border-br-value').textContent = br + 'px';
@@ -246,7 +341,6 @@ function updateTransform() {
     const translateY = document.getElementById('transform-translateY').value;
     const skewX = document.getElementById('transform-skewX').value;
 
-    // Update value displays
     document.getElementById('transform-rotate-value').textContent = rotate + '°';
     document.getElementById('transform-scaleX-value').textContent = scaleX;
     document.getElementById('transform-scaleY-value').textContent = scaleY;
@@ -280,13 +374,11 @@ function updateTextShadow() {
     const opacity = document.getElementById('text-opacity').value / 100;
     const sampleText = document.getElementById('text-sample').value;
 
-    // Update value displays
     document.getElementById('text-x-value').textContent = x + 'px';
     document.getElementById('text-y-value').textContent = y + 'px';
     document.getElementById('text-blur-value').textContent = blur + 'px';
     document.getElementById('text-opacity-value').textContent = document.getElementById('text-opacity').value + '%';
 
-    // Convert hex to rgba
     const r = parseInt(color.substr(1, 2), 16);
     const g = parseInt(color.substr(3, 2), 16);
     const b = parseInt(color.substr(5, 2), 16);
@@ -367,7 +459,6 @@ function updateFilter() {
     const hue = document.getElementById('filter-hue').value;
     const grayscale = document.getElementById('filter-grayscale').value;
 
-    // Update value displays
     document.getElementById('filter-blur-value').textContent = blur + 'px';
     document.getElementById('filter-brightness-value').textContent = brightness + '%';
     document.getElementById('filter-contrast-value').textContent = contrast + '%';
@@ -400,12 +491,10 @@ function updateGlass() {
     const borderColor = document.getElementById('glass-border-color').value;
     const borderOpacity = document.getElementById('glass-border-opacity').value / 100;
 
-    // Update displays
     document.getElementById('glass-opacity-value').textContent = opacity;
     document.getElementById('glass-blur-value').textContent = blur + 'px';
     document.getElementById('glass-border-opacity-value').textContent = borderOpacity;
 
-    // Helper to hex to rgba
     const hexToRgba = (hex, alpha) => {
         const r = parseInt(hex.substr(1, 2), 16);
         const g = parseInt(hex.substr(3, 2), 16);
@@ -431,140 +520,51 @@ border: 1px solid ${borderRgba};`;
     document.getElementById('glass-output').textContent = css;
 }
 
-// Toast Notification Function
 function showToast(message) {
-    // Create the toast element
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.innerHTML = `<span>✓</span> ${message}`;
     document.body.appendChild(toast);
-
-    // Trigger reflow to enable transition
     void toast.offsetWidth;
     toast.classList.add('show');
-
-    // Hide and remove after 3 seconds
     setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => {
             document.body.removeChild(toast);
-        }, 300); // Fade out transition
+        }, 300);
     }, 3000);
 }
 
-// Copy to Clipboard Function
 function copyToClipboard(elementId) {
     const text = document.getElementById(elementId).textContent;
     const button = event.target;
     const originalText = button.textContent;
     const originalClass = button.className;
 
-    // Try the modern Clipboard API first
     navigator.clipboard.writeText(text).then(() => {
         showToast('CSS Code copied to clipboard!');
-
-        // Update button text using the captured 'button' variable
         button.textContent = '✓ Copied!';
-
-        // Only change color if it's not already a specific style
         if (!originalClass.includes('btn-')) {
             button.className = originalClass.replace(/btn-\w+/, 'btn-green');
         }
-
-        // Reset button after 2 seconds
         setTimeout(() => {
             button.textContent = originalText;
             button.className = originalClass;
         }, 2000);
-
     }).catch(err => {
-        try {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            showToast('CSS Code copied to clipboard!');
-
-            button.textContent = '✓ Copied!';
-            setTimeout(() => {
-                button.textContent = originalText;
-            }, 2000);
-        } catch (fallbackErr) {
-            console.error('Copy failed:', fallbackErr);
-            showToast('Failed to copy. Please copy manually.');
-        }
+        console.error('Copy failed:', err);
+        showToast('Failed to copy');
     });
 }
 
-//  SAVE SNIPPET FUNCTION
-// ==========================================
-
-async function saveSnippet() {
-    const user = auth.currentUser;
-
-    if (!user) {
-        alert("Please Sign In to save your snippets!");
-        return;
-    }
-    const generatorTypes = ['gradient', 'shadow', 'border', 'flexbox', 'transform', 'text', 'animation', 'filter', 'glass'];
-    let activeType = null;
-    for (const type of generatorTypes) {
-        const el = document.getElementById(type + '-generator');
-
-        if (el && !el.classList.contains('hidden')) {
-            activeType = type;
-            break;
-        }
-    }
-
-    if (!activeType) {
-        console.error("Debug: Could not find any active generator div.");
-        alert("Error: No active generator found. Please refresh and try again.");
-        return;
-    }
-
-    const outputId = activeType + '-output';
-    const outputElement = document.getElementById(outputId);
-
-    if (!outputElement) {
-        alert(`Error: Could not find the CSS output box for ${activeType}`);
-        return;
-    }
-    const cssCode = outputElement.textContent;
-    try {
-        await addDoc(collection(db, "snippets"), {
-            userId: user.uid,
-            userEmail: user.email,
-            type: activeType,
-            code: cssCode,
-            timestamp: new Date()
-        });
-
-        alert(`✅ ${activeType.toUpperCase()} saved to Library!`);
-
-    } catch (e) {
-        console.error("Error adding document: ", e);
-        alert("Error saving: " + e.message);
-    }
-}
-
-// Initialize with gradient generator
-document.addEventListener('DOMContentLoaded', function () {
-    showGenerator('gradient');
-    // Ensure the first button marks as active if not already
-    const firstBtn = document.querySelector('.nav-button');
-    if (firstBtn && !document.querySelector('.nav-button.active')) {
-        firstBtn.classList.add('active');
-    }
-});
-
-// CONNECTING JS TO HTML
+//  CONNECTING JS TO HTML
 // ==========================================
 window.loginWithGoogle = loginWithGoogle;
 window.logout = logout;
 window.saveSnippet = saveSnippet;
+window.deleteSnippet = deleteSnippet;
+window.openLibrary = openLibrary;
+window.closeLibrary = closeLibrary;
 window.showGenerator = showGenerator;
 window.updateGradient = updateGradient;
 window.updateShadow = updateShadow;
