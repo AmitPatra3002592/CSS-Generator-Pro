@@ -127,8 +127,9 @@ async function openLibrary() {
                     <pre style="font-size:0.8rem; color:#888;">${data.code.substring(0, 30)}...</pre>
                 </div>
                 <div>
-                    <button onclick="copySnippet('${id}')" class="action-btn" style="font-size:0.8rem; padding:5px 10px;">Copy</button>
-                    <button onclick="deleteSnippet('${id}')" class="delete-btn">🗑️</button>
+                    <button onclick="copySnippet('${id}')" class="action-btn btn-blue" style="font-size:0.8rem; padding:5px 10px;">Copy</button>
+                    
+                    <button onclick="deleteSnippet('${id}')" class="delete-btn" title="Delete Saved Design">🗑️</button>
                 </div>
                 <textarea id="hidden-${id}" style="display:none">${data.code}</textarea>
             `;
