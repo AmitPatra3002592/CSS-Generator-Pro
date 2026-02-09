@@ -1,3 +1,10 @@
+:root {
+    --primary-color: #4f46e5;
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --border-color: #e5e7eb;
+}
+
 * {
     box-sizing: border-box;
     font-family: 'Inter', sans-serif;
@@ -50,6 +57,12 @@ header p {
 
 .header-right {
     display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-header-group {
+    display: none;
     align-items: center;
     gap: 15px;
 }
@@ -200,6 +213,139 @@ header p {
 
 .login-btn:hover {
     background-color: #357ae8;
+}
+
+/* Library Button specific adjustments */
+.library-btn {
+    background-color: #2563eb;
+    color: white;
+    padding: 10px 16px;
+}
+
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.profile-pic {
+    width: 40px !important;
+    /* Force size */
+    height: 40px !important;
+    /* Force size */
+    border-radius: 50%;
+    border: 2px solid var(--primary-color);
+    transition: transform 0.2s;
+    object-fit: cover;
+    /* Prevents squishing */
+}
+
+.profile-dropdown:hover .profile-pic {
+    transform: scale(1.1);
+}
+
+/* The Menu Box */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: var(--bg-color);
+    min-width: 120px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    z-index: 1000;
+    padding: 5px;
+}
+
+.profile-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.dropdown-btn:hover {
+    background-color: rgba(128, 128, 128, 0.1);
+    border-radius: 4px;
+}
+
+/* --- LIBRARY MODAL --- */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--bg-color);
+    color: var(--text-color);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    border-radius: 12px;
+    padding: 20px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.snippet-card {
+    background: rgba(128, 128, 128, 0.1);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
 }
 
 /* Theme Toggle Button Style */
@@ -679,11 +825,9 @@ body.dark-mode .value-display {
 /* Preview Box in Dark Mode */
 body.dark-mode .preview-box {
     background-color: #374151;
-    /* Darker background for preview area */
     border-color: #4b5563;
 }
 
-/* Adjusts Text Shadow Preview color so it's visible */
 body.dark-mode #text-preview {
     color: #ffffff;
 }
